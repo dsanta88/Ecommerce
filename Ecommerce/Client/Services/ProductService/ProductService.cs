@@ -2,39 +2,46 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace Ecommerce.Client.Services.ProductService
 {
     public class ProductService: IProductService
     {
-        public List<Product> Products { get; set; }
+        private readonly HttpClient _http;
 
-        public void LoadProducts()
+        public event Action OnChange;
+
+        public List<Product> Products { get; set; } = new List<Product>();
+
+        public ProductService(HttpClient http)
         {
-            Products = new List<Product>
-           {
-        new Product
-        {
-            Id=1,
-            CategoryId=1,
-            Title="Galax 34",
-            Description="Celular Sansung",
-            Image="https://i.pinimg.com/236x/76/d9/80/76d98054151d08ac8c1e625deff00874.jpg",
-            Price=9.99m,
-            OriginalPrice=19.99m,
-        },
-         new Product
-        {
-            Id=1,
-            CategoryId=1,
-            Title="Iphone 12",
-            Description="Iphone 12",
-            Image="https://i.pinimg.com/236x/76/d9/80/76d98054151d08ac8c1e625deff00874.jpg",
-            Price=8.19m,
-            OriginalPrice=29.99m,
+            _http = http;
         }
-    };
+
+
+     
+
+        public async Task LoadProducts(string categoryUrl=null)
+        {
+            if(categoryUrl==null)
+            {
+                Products = await _http.GetFromJsonAsync<List<Product>>($"api/Products");
+            }
+            else
+            {
+                Products = await _http.GetFromJsonAsync<List<Product>>($"api/Products/Category/{categoryUrl}");
+            }
+        
+            OnChange.Invoke();
+        }
+
+        public async Task<Product> GetProduct(int id)
+        {
+            return await _http.GetFromJsonAsync<Product>($"api/Products/{id}");
+
         }
     }
 }

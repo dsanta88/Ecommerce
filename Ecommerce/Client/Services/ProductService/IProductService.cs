@@ -6,10 +6,13 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Client.Services.ProductService
 {
-    interface IProductService
+  public  interface IProductService
     {
+        event Action OnChange;
         List<Product> Products { get; set; }
 
-        void LoadProducts();
+        Task LoadProducts(string categoryUrl=null);
+
+        Task<Product> GetProduct(int id);
     }
 }

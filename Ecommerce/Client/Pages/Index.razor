@@ -1,15 +1,16 @@
 ﻿@page "/"
 @page "/{categoryurl}"
 @inject ICategoryService CategoryService;
+@inject IProductService ProductService;
 
 @if (category != null)
 {
     <h1>Bienvenidos a @category.Name Sección</h1>
-    <ProductList CategoryId="@category.Id" />
+    <ProductList/>
 }
 else
 {
-  <h1>Bienvenidos a Ecommerce</h1>
+    <h1>Bienvenidos a Ecommerce</h1>
     <ProductList />
 }
 
@@ -21,8 +22,10 @@ else
 
     private Category category = null;
 
-   protected override void OnParametersSet()
+    protected override void OnParametersSet()
     {
+
+        ProductService.LoadProducts(CategoryUrl);
         @if (CategoryUrl != null)
         {
             category = CategoryService.Categories.FirstOrDefault(c => c.Url.ToLower().Equals(CategoryUrl.ToLower()));
