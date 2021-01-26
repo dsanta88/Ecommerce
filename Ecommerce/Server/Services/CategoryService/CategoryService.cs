@@ -1,4 +1,6 @@
-﻿using Ecommerce.Shared;
+﻿using Ecommerce.Server.Data;
+using Ecommerce.Shared;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,21 +11,21 @@ namespace Ecommerce.Server.Services.CategoryService
     public class CategoryService: ICategoryService
     {
 
-        public List<Category> Categories { get; set; } = new List<Category>
-            {
-             new Category{ Id=1, Name="Libros", Url="books", Icon="book"},
-             new Category{ Id=2, Name="Electronica", Url="electronics", Icon="camera-slr"},
-             new Category{ Id=3, Name="Video Juegos", Url="video-games", Icon="aperture"}
-            };
+        private readonly DataContext _db;
+
+        public CategoryService(DataContext db)
+        {
+            _db = db;
+        }
 
         public async Task<List<Category>> GetCategories()
         {
-            return Categories;
+            return await _db.Categories.ToListAsync();
         }
 
         public async Task<Category> GetCategoryByUrl(string categoryUrl)
         {
-            return Categories.FirstOrDefault(c=>c.Url.ToLower().Equals(categoryUrl.ToLower()));
+            return await _db.Categories.FirstOrDefaultAsync(c=>c.Url.ToLower().Equals(categoryUrl.ToLower()));
         }
     }
 }

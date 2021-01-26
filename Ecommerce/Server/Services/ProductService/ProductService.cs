@@ -1,5 +1,7 @@
-﻿using Ecommerce.Server.Services.CategoryService;
+﻿using Ecommerce.Server.Data;
+using Ecommerce.Server.Services.CategoryService;
 using Ecommerce.Shared;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,52 +13,34 @@ namespace Ecommerce.Server.Services.ProductService
     {
 
         private readonly ICategoryService _categoryService;
+        private readonly DataContext _context;
 
-        public ProductService(ICategoryService categoryService)
+        public ProductService(ICategoryService categoryService, DataContext context)
         {
             _categoryService = categoryService;
+            _context = context;
         }
 
         public async Task<List<Product>> GetAllProducts()
         {
-            return Products;
+            return await _context.Products.Include(p=>p.Variants).ToListAsync();
         }
 
         public async Task<Product> GetProduct(int id)
         {
-            Product product = Products.FirstOrDefault(p=>p.Id==id);
+            Product product =  await _context.Products
+                .Include(p=>p.Variants)
+                .ThenInclude(v=>v.Edition)
+                .FirstOrDefaultAsync(p=>p.Id==id);
             return product;
         }
 
         public async Task<List<Product>> GetProductByCategory(string categoryUrl)
         {
             Category category = await _categoryService.GetCategoryByUrl(categoryUrl);
-            return Products.Where(p=>p.CategoryId==category.Id).ToList();
+            return  await _context.Products.Include(v=>v.Variants).Where(p=>p.CategoryId==category.Id).ToListAsync();
         }
 
-  
-        public List<Product> Products { get; set; } = new List<Product>
-        {
-              new Product
-        {
-            Id=1,
-            CategoryId=1,
-            Title="Galax 34",
-            Description="Celular Sansung",
-            Image="https://i.pinimg.com/236x/76/d9/80/76d98054151d08ac8c1e625deff00874.jpg",
-            Price=9.99m,
-            OriginalPrice=19.99m,
-        },
-              new Product
-        {
-            Id=1,
-            CategoryId=1,
-            Title="Iphone 12",
-            Description="Iphone 12",
-            Image="https://i.pinimg.com/236x/76/d9/80/76d98054151d08ac8c1e625deff00874.jpg",
-            Price=8.19m,
-            OriginalPrice=29.99m,
-        }
-        };
+ 
     }
 }

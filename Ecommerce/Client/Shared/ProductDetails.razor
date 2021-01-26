@@ -3,27 +3,52 @@
 
 
 <div class="media">
-<div class="media-img-big-wrapper mr-2">
-    <img  class="media-img-big" src="@product.Image" alt="@product.Title"/>
-</div>
-<div class="media-body">
-    <h2 class="mb-0">@product.Title</h2>
-    <p>@product.Description</p>
-    @if(product.OriginalPrice>product.Price)
-    {
-        <h6 class="text-muted original-price">$@product.OriginalPrice</h6>
-    }
-        <h4 class="price">
-            $@product.Price
-        </h4>
+    <div class="media-img-big-wrapper mr-2">
+        <img class="media-img-big" src="@product.Image" alt="@product.Title" />
+    </div>
+    <div class="media-body">
+        <h2 class="mb-0">@product.Title</h2>
+        <p>@product.Description</p>
+
+        @if (product.Variants != null && product.Variants.Count > 1)
+        {
+            <div class="form-group">
+                <select class="form-control" @bind="currentEditionId">
+                    @foreach (var variant in product.Variants)
+                    {
+                        <option value="@variant.EditionId">@variant.Edition.Name</option>
+                    }
+                </select>
+            </div>
+
+        }
+
+
+        @if (GetSelectedVariant())
+        {
+            @if (@variant.OriginalPrice > @variant.Price)
+            {
+                <h6 class="text-muted original-price">$@variant.OriginalPrice</h6>
+            }
+
+          <h4 class="price">
+            $ @variant.Price
+          </h4>
+        }
+
+
+
+
         <button class="btn btn-primary"><i class="oi oi-cart"></i>&nbsp;&nbsp;&nbsp; Add to Cart</button>
 
-</div>
+    </div>
 </div>
 
 @code {
 
     private Product product = new Product();
+    private ProductVariant variant = new ProductVariant();
+    private int currentEditionId = 1;
 
     [Parameter]
     public int Id { get; set; }
@@ -32,5 +57,25 @@
     {
 
         product = await ProductService.GetProduct(Id);
+
+        if (product.Variants.Count > 0)
+        {
+            currentEditionId = product.Variants[0].EditionId;
+        }
+
     }
+
+    private bool GetSelectedVariant()
+    {
+        variant= product.Variants.FirstOrDefault(v => v.EditionId == currentEditionId);
+        if(variant!=null)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
 }

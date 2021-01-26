@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Ecommerce.Server.Services.CategoryService;
 using Ecommerce.Server.Services.ProductService;
+using Ecommerce.Server.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Server
 {
@@ -21,6 +23,9 @@ namespace Ecommerce.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<DataContext>(options =>
+             options.UseSqlServer(Configuration.GetConnectionString("strConexionSQL"))
+          );
 
             services.AddControllersWithViews();
             services.AddRazorPages();
