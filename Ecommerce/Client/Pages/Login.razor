@@ -1,0 +1,31 @@
+﻿@page "/login"
+@*@inject LocalStorageService LocalStorage*@
+@inject NavigationManager NavigationManager
+
+<h3> Login</h3>
+
+<EditForm Model="user" OnSubmit="HandleLogin">
+    <div class="form-group">
+        <label for="username">Usuario</label>
+        <InputText id="username" @bind-Value="user.Username" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <InputText id="password" @bind-Value="user.Password" type="password" class="form-control" />
+    </div>
+    <button type="submit"  class="btn btn-primary">Login</button>
+</EditForm>
+
+
+@code
+{
+    private User user = new User();
+
+    private async void HandleLogin()
+    {
+        Console.WriteLine("LOGIN XXXX");
+        //await LocalStorage.SetItemAsync<string>("username",user.Username);
+        //NavigationManager.NavigateTo("");
+
+    }
+}
